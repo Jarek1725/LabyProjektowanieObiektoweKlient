@@ -89,8 +89,9 @@ public class WSSClient extends WebSocketClient {
     }
 
     private void afterMessageAction(GameInfo gameInfo){
-        if(gameInfo.isWrongSelection()){
-            System.out.println("Wrong selection, try again");
+        if(gameInfo.isWrongSelection() && gameInfo.isYourTurn()){
+            gameInfo.getGameInfo().add("Wrong selection, try again");
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
             String selectedChessman = selectChessman();
             sendSelectedChessman(selectedChessman);
         }
