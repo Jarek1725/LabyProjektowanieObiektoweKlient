@@ -88,6 +88,12 @@ public class WSSClient extends WebSocketClient {
         return positionStartCoords;
     }
 
+    private String selectPositionToMove(){
+        System.out.print("Select position to move, for example 'A2': ");
+        String positionEndCoords = scanner.nextLine();
+        return positionEndCoords;
+    }
+
     private void afterMessageAction(GameInfo gameInfo){
         if(gameInfo.isWrongSelection() && gameInfo.isYourTurn()){
             gameInfo.getGameInfo().add("Wrong selection, try again");
@@ -95,11 +101,15 @@ public class WSSClient extends WebSocketClient {
             String selectedChessman = selectChessman();
             sendSelectedChessman(selectedChessman);
         }
-        else if(gameInfo.isYourTurn()){
+        else if(gameInfo.isYourTurn() && gameInfo.isSelecting()){
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-            String selectedChessman = selectChessman();
-            sendSelectedChessman(selectedChessman);
-        } else{
+            String selectedChessman = selectPositionToMove();
+            sendSelectedPositionToMove(selectedChessman);
+        } else if(gameInfo.isYourTurn() && !gameInfo.isSelecting()){
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+        }
+
+        else {
             gameInfo.getGameInfo().add("Waiting for opponent move");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
         }
@@ -107,5 +117,9 @@ public class WSSClient extends WebSocketClient {
 
     private void sendSelectedChessman(String selectedChessman){
         this.send("selectedChessman:"+selectedChessman);
+    }
+
+    private void sendSelectedPositionToMove(String selectedPositionToMove){
+        this.send("selectedPositionToMove:"+selectedPositionToMove);
     }
 }

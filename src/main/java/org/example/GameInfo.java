@@ -11,6 +11,8 @@ public class GameInfo {
     private boolean wrongSelection = false;
     private boolean wrongMove = false;
     private boolean gameRunning = false;
+    private boolean selecting = false;
+
 
     public GameInfo(Position[][] positions, List<String> gameInfo, boolean isYourTurn, boolean isEnd) {
         this.positions = positions;
@@ -96,5 +98,13 @@ public class GameInfo {
 
     public void setGameRunning(boolean gameRunning) {
         this.gameRunning = gameRunning;
+    }
+
+    public boolean isSelecting() {
+        return selecting;
+    }
+
+    public void setSelecting(boolean selecting) {
+        this.selecting = selecting;
     }
 }
