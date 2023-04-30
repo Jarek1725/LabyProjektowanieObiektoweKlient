@@ -101,15 +101,13 @@ public class WSSClient extends WebSocketClient {
             String selectedChessman = selectChessman();
             sendSelectedChessman(selectedChessman);
         }
-        else if(gameInfo.isYourTurn() && gameInfo.isSelecting()){
+        else if(gameInfo.isYourTurn() && !gameInfo.isSelecting()){
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
             String selectedChessman = selectPositionToMove();
             sendSelectedPositionToMove(selectedChessman);
-        } else if(gameInfo.isYourTurn() && !gameInfo.isSelecting()){
+        } else if(gameInfo.isYourTurn() && gameInfo.isSelecting()){
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-        }
-
-        else {
+        } else {
             gameInfo.getGameInfo().add("Waiting for opponent move");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
         }
