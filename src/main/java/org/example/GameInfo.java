@@ -13,6 +13,8 @@ public class GameInfo {
     private boolean gameRunning = false;
     private boolean selectingPositionToMove = false;
 
+    private boolean opponentLeft = false;
+
 
     public GameInfo(Position[][] positions, List<String> gameInfo, boolean isYourTurn, boolean isEnd) {
         this.positions = positions;
@@ -106,5 +108,9 @@ public class GameInfo {
 
     public void setSelectingPositionToMove(boolean selectingPositionToMove) {
         this.selectingPositionToMove = selectingPositionToMove;
+    }
+
+    public boolean isOpponentLeft() {
+        return opponentLeft;
     }
 }

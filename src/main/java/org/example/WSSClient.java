@@ -106,12 +106,34 @@ public class WSSClient extends WebSocketClient {
             String selectedChessman = selectPositionToMove();
             sendSelectedPositionToMove(selectedChessman);
         } else if(gameInfo.isYourTurn() && gameInfo.isSelectingPositionToMove()){
+            gameInfo.getGameInfo().add("Your turn");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
             String selectedChessman = selectChessman();
             sendSelectedChessman(selectedChessman);
+        } else if(!gameInfo.isGameRunning()){
+            gameInfo.getGameInfo().add("Waiting for opponent");
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+        } else if(gameInfo.isOpponentLeft()){
+            gameInfo.getGameInfo().add("Opponent left");
+            gameInfo.getGameInfo().add("Congratulations, you won!");
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+            handleOpponentLeft();
         } else {
             gameInfo.getGameInfo().add("Waiting for opponent move");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+        }
+    }
+
+    private void handleOpponentLeft() {
+        System.out.println("Do you want to play again? (y/n)");
+        String playAgain = scanner.nextLine();
+        if (playAgain.equalsIgnoreCase("y")) {
+            System.out.println("Joining a new room...");
+            joinRoom();
+        } else {
+            System.out.println("Closing the application...");
+            close();
+            System.exit(0);
         }
     }
 
