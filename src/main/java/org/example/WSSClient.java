@@ -8,6 +8,7 @@ import org.java_websocket.handshake.ServerHandshake;
 import java.net.URI;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Supplier;
 
 public class WSSClient extends WebSocketClient {
     private int roomNumber;
@@ -98,17 +99,17 @@ public class WSSClient extends WebSocketClient {
         if(gameInfo.isWrongSelection() && gameInfo.isYourTurn()){
             gameInfo.getGameInfo().add("Wrong selection, try again");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-            String selectedChessman = selectChessman();
+            String selectedChessman = startUserInteractionThread(this::selectChessman);
             sendSelectedChessman(selectedChessman);
         }
         else if(gameInfo.isYourTurn() && !gameInfo.isSelectingPositionToMove()){
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-            String selectedChessman = selectPositionToMove();
-            sendSelectedPositionToMove(selectedChessman);
+            String selectedPositionToMove = startUserInteractionThread(this::selectPositionToMove);
+            sendSelectedPositionToMove(selectedPositionToMove);
         } else if(gameInfo.isYourTurn() && gameInfo.isSelectingPositionToMove()){
             gameInfo.getGameInfo().add("Your turn");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-            String selectedChessman = selectChessman();
+            String selectedChessman = startUserInteractionThread(this::selectChessman);
             sendSelectedChessman(selectedChessman);
         } else if(!gameInfo.isGameRunning()){
             gameInfo.getGameInfo().add("Waiting for opponent");
@@ -126,14 +127,11 @@ public class WSSClient extends WebSocketClient {
 
     private void handleOpponentLeft() {
         System.out.println("Do you want to play again? (y/n)");
-        String playAgain = scanner.nextLine();
-        if (playAgain.equalsIgnoreCase("y")) {
-            System.out.println("Joining a new room...");
-            joinRoom();
+        String answer = scanner.nextLine();
+        if(answer.equals("y")){
+            this.sendMessage("playAgain");
         } else {
-            System.out.println("Closing the application...");
-            close();
-            System.exit(0);
+            this.sendMessage("exit");
         }
     }
 
@@ -144,4 +142,20 @@ public class WSSClient extends WebSocketClient {
     private void sendSelectedPositionToMove(String selectedPositionToMove){
         this.send("selectedPositionToMove:"+selectedPositionToMove);
     }
+
+
+    private String startUserInteractionThread(Supplier<String> userAction) {
+        final String[] result = new String[1];
+        Thread userInteractionThread = new Thread(() -> {
+            result[0] = userAction.get();
+        });
+        userInteractionThread.start();
+        try {
+            userInteractionThread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return result[0];
+    }
+
 }
