@@ -14,6 +14,7 @@ public class WSSClient extends WebSocketClient {
     private int roomNumber;
     ObjectMapper objectMapper = new ObjectMapper();
     private final Scanner scanner = new Scanner(System.in);
+    private volatile boolean opponentLeft = false;
 
 
     public WSSClient(URI serverUri) {
@@ -101,6 +102,10 @@ public class WSSClient extends WebSocketClient {
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
             String selectedChessman = startUserInteractionThread(this::selectChessman);
             sendSelectedChessman(selectedChessman);
+        }else if(gameInfo.isOpponentLeft()){
+            gameInfo.getGameInfo().add("Opponent left");
+            gameInfo.getGameInfo().add("Congratulations, you won!");
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
         }
         else if(gameInfo.isYourTurn() && !gameInfo.isSelectingPositionToMove()){
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
@@ -114,26 +119,12 @@ public class WSSClient extends WebSocketClient {
         } else if(!gameInfo.isGameRunning()){
             gameInfo.getGameInfo().add("Waiting for opponent");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-        } else if(gameInfo.isOpponentLeft()){
-            gameInfo.getGameInfo().add("Opponent left");
-            gameInfo.getGameInfo().add("Congratulations, you won!");
-            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-            handleOpponentLeft();
-        } else {
+        }  else {
             gameInfo.getGameInfo().add("Waiting for opponent move");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
         }
     }
 
-    private void handleOpponentLeft() {
-        System.out.println("Do you want to play again? (y/n)");
-        String answer = scanner.nextLine();
-        if(answer.equals("y")){
-            this.sendMessage("playAgain");
-        } else {
-            this.sendMessage("exit");
-        }
-    }
 
     private void sendSelectedChessman(String selectedChessman){
         this.send("selectedChessman:"+selectedChessman);
@@ -147,7 +138,17 @@ public class WSSClient extends WebSocketClient {
     private String startUserInteractionThread(Supplier<String> userAction) {
         final String[] result = new String[1];
         Thread userInteractionThread = new Thread(() -> {
-            result[0] = userAction.get();
+            while (!opponentLeft) {
+                result[0] = userAction.get();
+                if (result[0] != null) {
+                    break;
+                }
+                try {
+                    Thread.sleep(100); // Czekaj 100ms przed kolejnym sprawdzeniem
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         });
         userInteractionThread.start();
         try {
@@ -157,5 +158,6 @@ public class WSSClient extends WebSocketClient {
         }
         return result[0];
     }
+
 
 }
