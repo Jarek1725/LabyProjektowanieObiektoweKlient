@@ -90,6 +90,11 @@ public class WSSClient extends WebSocketClient {
         return positionStartCoords;
     }
 
+    private String selectPawnToUpgrade(){
+        System.out.print("Choose chessman to upgrade: (Queen | Rook | Bishop | Knight): ");
+        return scanner.nextLine();
+    }
+
     private String selectPositionToMove(){
         System.out.print("Select position to move, for example 'A2': ");
         String positionEndCoords = scanner.nextLine();
@@ -106,7 +111,13 @@ public class WSSClient extends WebSocketClient {
             gameInfo.getGameInfo().add("Opponent left");
             gameInfo.getGameInfo().add("Congratulations, you won!");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
-        } else if(gameInfo.isWrongMove()){
+        } else if(gameInfo.isUpgradePawn()){
+            gameInfo.getGameInfo().add("Upgrade pawn");
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+            String upgradePawn = startUserInteractionThread(this::selectPawnToUpgrade);
+            sendSelectedChessman(upgradePawn);
+        }
+        else if(gameInfo.isWrongMove()){
             gameInfo.getGameInfo().add("Wrong move, try again");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
             String selectedChessman = startUserInteractionThread(this::selectChessman);

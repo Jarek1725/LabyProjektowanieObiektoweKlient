@@ -13,6 +13,8 @@ public class GameInfo {
     private boolean gameRunning = false;
     private boolean selectingPositionToMove = false;
 
+    private boolean upgradePawn = false;
+
     private boolean opponentLeft = false;
 
 
@@ -112,5 +114,17 @@ public class GameInfo {
 
     public boolean isOpponentLeft() {
         return opponentLeft;
+    }
+
+    public boolean isUpgradePawn() {
+        return upgradePawn;
+    }
+
+    public void setUpgradePawn(boolean upgradePawn) {
+        this.upgradePawn = upgradePawn;
+    }
+
+    public void setOpponentLeft(boolean opponentLeft) {
+        this.opponentLeft = opponentLeft;
     }
 }
