@@ -115,7 +115,7 @@ public class WSSClient extends WebSocketClient {
             gameInfo.getGameInfo().add("Upgrade pawn");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
             String upgradePawn = startUserInteractionThread(this::selectPawnToUpgrade);
-            sendSelectedChessman(upgradePawn);
+            sendSelectedUpgrade(upgradePawn);
         }
         else if(gameInfo.isWrongMove()){
             gameInfo.getGameInfo().add("Wrong move, try again");
@@ -144,6 +144,9 @@ public class WSSClient extends WebSocketClient {
 
     private void sendSelectedChessman(String selectedChessman){
         this.send("selectedChessman:"+selectedChessman);
+    }
+    private void sendSelectedUpgrade(String selectedChessman){
+        this.send("upgradePawn:"+selectedChessman);
     }
 
     private void sendSelectedPositionToMove(String selectedPositionToMove){
