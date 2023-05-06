@@ -106,6 +106,11 @@ public class WSSClient extends WebSocketClient {
             gameInfo.getGameInfo().add("Opponent left");
             gameInfo.getGameInfo().add("Congratulations, you won!");
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+        } else if(gameInfo.isWrongMove()){
+            gameInfo.getGameInfo().add("Wrong move, try again");
+            drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
+            String selectedChessman = startUserInteractionThread(this::selectChessman);
+            sendSelectedChessman(selectedChessman);
         }
         else if(gameInfo.isYourTurn() && !gameInfo.isSelectingPositionToMove()){
             drawBoard(gameInfo.getPositions(), gameInfo.getGameInfo());
